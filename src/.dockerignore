@@ -1,0 +1,8 @@
+bin
+obj
+*.user
+Properties/launchSettings.json
+.vs
+*.log
+DS_image
+appsettings.Development.json
