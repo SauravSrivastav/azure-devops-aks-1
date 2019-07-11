@@ -22,7 +22,7 @@ steps:
 
 - script: |
     echo "Replacing vars in k8s/net-app.yaml"
-    cat k8s/net-app.yaml | sed s/BUILDNUM/$(Build.BuildNumber)/g | sed s/AKSURL/$(aksurl)/g | sed s/ACRURL/$(acrurl)/g > k8s/net-app.yaml
+    cat sed -i k8s/net-app.yaml s/BUILDNUM/$(Build.BuildNumber)/g | sed s/AKSURL/$(aksurl)/g | sed s/ACRURL/$(acrurl)/g > k8s/net-app.yaml
     cat k8s/net-app.yaml
     echo "Replaced it"
   displayName: 'Replace vars in k8s yaml'
