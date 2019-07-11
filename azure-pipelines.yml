@@ -10,10 +10,31 @@ pool:
   vmImage: 'ubuntu-latest'
 
 steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+- task: Docker@2
+  inputs:
+    containerRegistry: 'robrich-acr'
+    repository: 'net-app'
+    command: 'buildAndPush'
+    Dockerfile: '**/Dockerfile'
+    tags: |
+      v-$(Build.BuildNumber)
+      latest
 
 - script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+    echo "Replacing vars in k8s/net-app.yaml"
+    cat k8s/net-app.yaml | sed s/BUILDNUM/$(Build.BuildNumber)/g | sed s/AKSURL/$(aksurl)/g | sed s/ACRURL/$(acrurl)/g > k8s/net-app.yaml
+    cat k8s/net-app.yaml
+    echo "Replaced it"
+  displayName: 'Replace vars in k8s yaml'
+
+- task: CopyFiles@2
+  inputs:
+    SourceFolder: 'k8s'
+    Contents: '**'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)'
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'drop'
+    publishLocation: 'Container'
+    
